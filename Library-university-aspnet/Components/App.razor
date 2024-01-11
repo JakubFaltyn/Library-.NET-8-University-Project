@@ -5,16 +5,95 @@
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <base href="/" />
-    <link rel="stylesheet" href="bootstrap/bootstrap.min.css" />
-    <link rel="stylesheet" href="app.css" />
-    <link rel="stylesheet" href="Library-university-aspnet.styles.css" />
+    <!-- Library / Plugin Css Build -->
+    <link rel="stylesheet" href="css/core/libs.min.css" />
+
+    <!-- Aos Animation Css -->
+    <link rel="stylesheet" href="vendor/aos/dist/aos.css" />
+
+    <!-- Hope Ui Design System Css -->
+    <link rel="stylesheet" href="css/hope-ui.min.css?v=2.0.0" />
+
+    <!-- Custom Css -->
+    <link rel="stylesheet" href="css/custom.min.css?v=2.0.0" />
+
+    <!-- Dark Css -->
+    <link rel="stylesheet" href="css/dark.min.css" />
+
+    <!-- Customizer Css -->
+    <link rel="stylesheet" href="css/customizer.min.css" />
+
+    <!-- RTL Css -->
+    <link rel="stylesheet" href="css/rtl.min.css" />
+
     <link rel="icon" type="image/png" href="favicon.png" />
     <HeadOutlet />
 </head>
 
 <body>
+@*     <!-- loader Start -->
+    <div id="loading">
+        <div class="loader simple-loader">
+            <div class="loader-body"></div>
+        </div>
+    </div>
+    <!-- loader END --> *@
     <Routes />
     <script src="_framework/blazor.web.js"></script>
+
+    <!-- App Script -->
+    <script>
+        document.addEventListener('DOMContentLoaded', function () {
+            // Array of script sources
+            var scriptSources = [
+                'js/core/libs.min.js',
+                'js/core/external.min.js',
+                'js/charts/widgetcharts.js',
+                'js/charts/vectore-chart.js',
+                'js/charts/dashboard.js',
+                'js/plugins/fslightbox.js',
+                'js/plugins/setting.js',
+                'js/plugins/slider-tabs.js',
+                'js/plugins/form-wizard.js',
+                'vendor/aos/dist/aos.js',
+                'js/hope-ui.js',
+            ];
+
+            // Function to load each script sequentially
+            function loadScriptsSequentially(scripts, index) {
+                if (index < scripts.length) {
+                    loadScript(scripts[index])
+                        .then(function () {
+                            // Load the next script in the array
+                            loadScriptsSequentially(scripts, index + 1);
+                        })
+                        .catch(function (error) {
+                            console.error('Error loading script:', error);
+                        });
+                } else {
+                    // All scripts are loaded
+                    console.log('All scripts loaded successfully.');
+                    // Your additional code after all scripts have loaded
+                }
+            }
+
+            // Function to load a single script
+            function loadScript(src) {
+                return new Promise(function (resolve, reject) {
+                    var scriptElement = document.createElement('script');
+                    scriptElement.src = src;
+                    scriptElement.onload = resolve;
+                    scriptElement.onerror = reject;
+                    document.head.appendChild(scriptElement);
+                });
+            }
+
+            // Start loading scripts sequentially
+            loadScriptsSequentially(scriptSources, 0);
+        });
+    </script>
+
+
 </body>
 
 </html>

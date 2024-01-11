@@ -1,0 +1,70 @@
+﻿@page "/"
+@using Library_university_aspnet.Models
+@using Library_university_aspnet.Services
+@rendermode @(new InteractiveServerRenderMode(prerender: false))
+@inject IBookService BookService
+@inject NavigationManager NavigationManager
+
+<PageTitle>Library</PageTitle>
+
+<h1>Library</h1>
+
+@if(books.Count == 0)
+{
+    <p><em>Loading Books...</em></p>
+}
+else
+{
+    <table>
+        <thead>
+            <tr>
+                <th>Title</th>
+                <th>Author</th>
+                <th>Genre</th>
+                <th>Actions</th>
+            </tr>
+        </thead>
+        <tbody>
+            @foreach (var book in books)
+            {
+                <tr>
+                    <td>@book.Title</td>
+                    <td>@book.Author.Name</td>
+                    <td>@book.Genre.Name</td>
+                    <td>
+                        <button class="btn btn-primary" @onclick="@(() => EditBook(book.BookId))">Edit</button>
+                        <button class="btn btn-danger" @onclick="@(() => DeleteBook(book.BookId))">Delete</button>
+
+                    </td>
+                </tr>
+            }
+        </tbody>
+    </table>
+
+<button class="btn btn-primary" @onclick="@(() => CreateBook())">Create</button>
+}
+
+@code {
+    List<Book> books = new List<Book>();
+
+    protected override async Task OnInitializedAsync()
+    {
+        books = await BookService.GetAllBooksAsync();
+    }
+
+    void EditBook(int id)
+    {
+        NavigationManager.NavigateTo($"/edit-book/{id}");
+    }
+
+    void CreateBook()
+    {
+        NavigationManager.NavigateTo($"/edit-book");
+    }
+
+    async Task DeleteBook(int id)
+    {
+        await BookService.DeleteBookAsync(id);
+        books = await BookService.GetAllBooksAsync();
+    }
+}

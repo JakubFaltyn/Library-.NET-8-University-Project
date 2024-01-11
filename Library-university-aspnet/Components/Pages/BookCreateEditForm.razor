@@ -1,0 +1,110 @@
+﻿@page "/edit-book"
+@page "/edit-book/{Id:int}"
+@inject IBookService BookService
+@inject IAuthorService AuthorService
+@inject IGenreService GenreService
+@inject NavigationManager NavigationManager
+@rendermode InteractiveServer
+
+@if (Id is null)
+{
+    <h3>Create Book</h3>
+    
+}
+else
+{
+    <h3>Edit "@CurrentBook.Title"</h3>
+}
+
+<EditForm Model="CurrentBook" OnSubmit="HandleSubmit">
+    <div>
+        <label for="title">Title</label>
+        <InputText id="title" @bind-Value="CurrentBook.Title" class="form-control"/>
+    </div>
+    <div>
+        <label for="author">Author</label>
+        <InputText id="author" @bind-Value="CurrentAuthor.Name" class="form-control"/>
+    </div>
+    <div>
+        <label for="genre">Genre</label>
+        <InputText id="genre" @bind-Value="CurrentGenre.Name" class="form-control" />
+    </div>
+    <button type="submit" class="btn btn-primary">Save</button>
+</EditForm>
+
+@code {
+    [Parameter]
+    public int? Id { get; set; }
+
+    public Book CurrentBook { get; set; } = new();
+    public Author CurrentAuthor { get; set; } = new();
+    public Genre CurrentGenre { get; set; } = new();
+    public Author NewAuthor { get; set; } = new();
+    public Genre NewGenre { get; set; } = new();
+
+
+    protected override async Task OnParametersSetAsync()
+    {
+        if (Id is not null)
+        {
+            var book = await BookService.GetBookByIdAsync((int)Id);
+            if (book is not null)
+            {
+                CurrentBook = book;
+                var author = await AuthorService.GetAuthorByIdAsync(book.AuthorId);
+                var genre = await GenreService.GetGenreByIdAsync(book.GenreId);
+
+                if (author is not null)
+                {
+                    CurrentAuthor = author;
+                }
+
+                if (genre is not null)
+                {
+                    CurrentGenre = genre;
+                }
+            }
+        }
+    }
+
+    async Task CreateIfNotExist()
+    {
+        @if (await AuthorService.CheckAuthorExistenceByName(CurrentAuthor.Name) == false)
+        {
+            NewAuthor.Name = CurrentAuthor.Name;
+            await AuthorService.AddAuthorAsync(NewAuthor);
+        }
+
+        if (await GenreService.CheckGenreExistenceByName(CurrentGenre.Name) == false)
+        {
+            NewGenre.Name = CurrentGenre.Name;
+            await GenreService.AddGenreAsync(NewGenre);
+        }
+    }
+
+    async Task HandleSubmit()
+    {
+        await CreateIfNotExist();
+
+        var author = await AuthorService.GetAuthorByNameAsync(CurrentAuthor.Name);
+        CurrentBook.AuthorId = author.AuthorId;
+
+
+        var genre = await GenreService.GetGenreByNameAsync(CurrentGenre.Name);
+        CurrentBook.GenreId = genre.GenreId;
+
+        if (Id is null)
+        {
+
+            await BookService.AddBookAsync(CurrentBook);
+            NavigationManager.NavigateTo("/");
+        }
+        else
+        {
+             
+            await BookService.UpdateBookAsync(CurrentBook, (int)Id);
+            NavigationManager.NavigateTo("/");
+        }
+    }
+}
+

@@ -38,9 +38,11 @@ namespace Library_university_aspnet.Data
                 new Book { BookId = 1, Title = "The Future", AuthorId = 1, GenreId = 1 },
                 new Book { BookId = 2, Title = "Secrets Unveiled", AuthorId = 2, GenreId = 2 }
             );
+
         }
         public DbSet<Book> Books { get; set; }
         public DbSet<Author> Authors { get; set; }
         public DbSet<Genre> Genres { get; set; }
+        public DbSet<Reservation> Reservations { get; set; }
     }
 }

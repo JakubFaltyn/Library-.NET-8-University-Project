@@ -13,5 +13,7 @@ namespace Library_university_aspnet.Models
         // Navigation properties
         public Author Author { get; set; }
         public Genre Genre { get; set; }
+
+        public virtual ICollection<Reservation> Reservations { get; set; }
     }
 }
